@@ -1,0 +1,28 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- set sls_package_install = tplroot ~ ".package.install" %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+{%- from tplroot ~ "/libtofsstack.jinja" import files_switch with context %}
+
+include:
+  - {{ sls_package_install }}
+
+{= service_name =} configuration is managed:
+  file.managed:
+    - name: {{ {= abbr_pysafe =}.lookup.config }}
+    - source: {{ files_switch(
+                    ["{= config.split("/") | last =}", "{= config.split("/") | last ~ ".j2" =}"],
+                    config={= abbr_pysafe =},
+                    lookup="{= service_name =} configuration is managed",
+                 )
+              }}
+    - mode: '0644'
+    - user: root
+    - group: {{ {= abbr_pysafe =}.lookup.rootgroup }}
+    - makedirs: true
+    - template: jinja
+    - require:
+      - sls: {{ sls_package_install }}
+    - context:
+        {= abbr_pysafe =}: {{ {= abbr_pysafe =} | json }}

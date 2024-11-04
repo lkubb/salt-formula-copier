@@ -1,0 +1,34 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+
+# There is no need for python-apt anymore.
+
+{%- for reponame, enabled in {= abbr_pysafe =}.lookup.enablerepo.items() %}
+{%-   if enabled %}
+
+{= service_name =} {{ reponame }} repository is available:
+  pkgrepo.managed:
+{%-     for conf, val in {= abbr_pysafe =}.lookup.repos[reponame].items() %}
+    - {{ conf }}: {{ val }}
+{%-     endfor %}
+{%-     if {= abbr_pysafe =}.lookup.pkg_manager in ["dnf", "yum", "zypper"] %}
+    - enabled: 1
+{%-     endif %}
+    - require_in:
+      - {= service_name =} is installed
+
+{%-   else %}
+
+{= service_name =} {{ reponame }} repository is disabled:
+  pkgrepo.absent:
+{%-     for conf in ["name", "ppa", "ppa_auth", "keyid", "keyid_ppa", "copr"] %}
+{%-       if conf in {= abbr_pysafe =}.lookup.repos[reponame] %}
+    - {{ conf }}: {{ {= abbr_pysafe =}.lookup.repos[reponame][conf] }}
+{%-       endif %}
+{%-     endfor %}
+    - require_in:
+      - {= service_name =} is installed
+{%-   endif %}
+{%- endfor %}

@@ -1,0 +1,24 @@
+# vim: ft=sls
+
+{#-
+    *Meta-state*.
+
+    Undoes everything performed in the ``{= abbr_pysafe =}`` meta-state
+    in reverse order, i.e.{! if service !}
+    stops the service,{! endif !} {!- if config !}
+    removes the configuration file and then
+    {!- endif !}
+    uninstalls the package.
+#}
+
+include:
+{!- if subcomponent !}
+  - .{= subcomponent =}.clean
+{!- endif !}
+{!- if service !}
+  - .service.clean
+{!- endif !}
+{!- if config !}
+  - .config.clean
+{!- endif !}
+  - .package.clean

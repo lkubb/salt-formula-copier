@@ -1,0 +1,12 @@
+# vim: ft=sls
+
+{#-
+    Manages the {= abbr_pysafe =} {= subcomponent =} configuration.
+#}
+
+include:
+{!- if subcomponent_config !}
+  - .config
+{!- else !}
+  []
+{!- endif !}

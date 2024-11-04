@@ -1,0 +1,34 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{!- if config !}
+{%- set sls_config_file = tplroot ~ ".config.file" %}
+{!- endif !}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+{%- from tplroot ~ "/libtofsstack.jinja" import files_switch with context %}
+
+{!- if config !}
+
+include:
+  - {{ sls_config_file }}
+{!- endif !}
+
+{= abbr_pysafe =} {= subcomponent =} config is managed:
+  file.managed:
+    - name: {{ {= abbr_pysafe =}.lookup.{= subcomponent =}.config }}
+    - source: {{ files_switch(
+                    ["{= subcomponent =}-example.tmpl"],
+                    config={= abbr_pysafe =},
+                    lookup="{= abbr_pysafe =} {= subcomponent =} config is managed",
+                    use_subpath=True,
+                 )
+              }}
+    - mode: '0644'
+    - user: root
+    - group: {{ {= abbr_pysafe =}.lookup.rootgroup }}
+    - makedirs: true
+    - template: jinja
+{!- if config !}
+    - require_in:
+      - sls: {{ sls_config_file }}
+{!- endif !}

@@ -1,0 +1,138 @@
+---
+service_name:
+  type: str
+  help: >
+    Name of the managed program.
+  placeholder: Gitea
+  validator: >-
+    {!- if not service_name !}
+    Service name cannot be empty.
+    {!- endif !}
+
+service_abbr:
+  type: str
+  help: >
+    A slugified version of `service_name`.
+  placeholder: gitea
+  default: '{= service_name | lower | regex_replace("[^a-z0-9]", "-") =}'
+  validator: >-
+    {!- if not service_abbr !}
+    Service abbreviation cannot be empty.
+    {!- endif !}
+
+abbr_pysafe:
+  type: str
+  help: >
+    A short and pythonic version of `service_name`.
+  placeholder: gitea
+  default: '{= service_abbr | regex_replace("\W", "_") =}'
+  validator: >-
+    {!- if not abbr_pysafe !}
+    Cannot be empty.
+    {!- endif !}
+    {!- if not (abbr_pysafe | regex_search("^[a-z][a-z0-9_]+$")) !}
+    Must start with a lowercase letter, followed by lowercase letters/digits or underscores.
+    {!- endif !}
+
+pkg:
+  type: str
+  help: >
+    The name of the package to install. Leave empty to skip.
+  placeholder: gitea
+  default: '{= service_abbr =}'
+
+needs_repo:
+  type: bool
+  help: >
+    Whether the package installation relies on custom repositories.
+  default: false
+
+config:
+  type: str
+  help: >
+    Path to the default config file. Leave empty to skip.
+  default: '/etc/{= service_abbr =}'
+
+service:
+  type: str
+  help: >
+    The name of the service (usually sytemd unit name). Leave empty to skip.
+  default: '{= service_abbr =}'
+
+subcomponent:
+  type: str
+  help: >
+    The name of a subcomponent, if applicable. Leave empty to skip.
+  default: ''
+
+subcomponent_config:
+  type: str
+  help: >
+    Path to the default config file of the subcomponent. Leave empty to skip.
+  default: ''
+  when: '{= not not subcomponent =}'
+
+author:
+  type: str
+  help: Your Github/Gitlab/... username that should be used as the author of the formula.
+  placeholder: garyhost
+  default: ''
+
+lookup:
+  type: yaml
+  multiline: true
+  help: >
+    An arbitrarily nested mapping/dictionary that describes lookup data that the
+    user should not have to modify. Examples include package dependencies,
+    some paths, package names etc.
+  validator: >-
+    {!- if lookup is not mapping !}Must be a mapping{!- endif !}
+  default: '{}'
+
+settings:
+  type: yaml
+  multiline: true
+  help: >
+    An arbitrarily nested mapping/dictionary that describes global parameters
+    for the formula. Examples include package version and system configuration
+    for the managed program.
+  validator: >-
+    {!- if settings is not mapping !}Must be a mapping{!- endif !}
+  default: '{}'
+
+# ===========================================
+# | Computed values for less ugly templates |
+# ===========================================
+
+
+# ========================================
+# | Migrations between template versions |
+# ========================================
+
+
+# =====================================
+# | Copier settings for this template |
+# =====================================
+
+# Let's require a recent version
+_min_copier_version: "9.3.0"
+
+# The template root is found here
+_subdirectory: project
+
+# _templates_suffix: j2
+
+_envops:
+  block_start_string: '{!'
+  block_end_string: '!}'
+  variable_start_string: '{='
+  variable_end_string: '=}'
+  comment_start_string: '{@'
+  comment_end_string: '@}'
+
+# We need those extensions as helpers
+_jinja_extensions:
+  - copier_templates_extensions.TemplateExtensionLoader
+  - jinja_extensions/formula.py:YamlDumper
+  - jinja2.ext.do
+  - jinja2.ext.loopcontrols

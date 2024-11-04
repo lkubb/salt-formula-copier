@@ -1,0 +1,25 @@
+# vim: ft=yaml
+#
+# Set values specific to:
+#   salt['config.get']('os_family') == RedHat.
+#
+# You just need to add the key:values for this `os_family` that differ
+# from `defaults.yaml` + `<osarch>.yaml`.
+#
+# If you do not need to provide defaults via the `os_family` config,
+# you can remove this file or provide at least an empty dict, e.g.
+# values: {}
+---
+values:
+  lookup:
+    pkg_manager: yum
+{!- if needs_repo !}
+    repos:
+      stable:
+        humanname: {= service_name =} stable
+        name: {= service_name =} stable
+        baseurl: https://FIXME/rpm/stable
+        gpgkey: https://FIXME/key.gpg
+        gpgcheck: 1
+{!- endif !}
+...
