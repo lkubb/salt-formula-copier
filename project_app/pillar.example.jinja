@@ -1,0 +1,173 @@
+# vim: ft=yaml
+# yamllint disable rule:comments-indentation
+---
+######################################################################
+# Mind that this is to be read as an overview of available
+# settings which can be set in many different ways, not only
+# by providing pillar values.
+# The different sources will be merged. For further information,
+# please see the docs, `libmapstack.jinja` as well as the configured
+# default sources in `parameters/map_jinja.yaml`.
+#
+# This documentation will need to be updated once there is
+# some learned experience. @TODO
+######################################################################
+
+# Apart from the various source files, there are two independent source trees
+# for user-specific configuration.
+# Generally tool_{= abbr_pysafe =} > tool_global.
+# `tool_global` focuses on specific users, of which most values
+# will be respected by all formulae in the `tool` suite:
+tool_global:
+  users:
+
+      # The following is global configuration for the user named `user`.
+    user:
+
+{!- if has_xdg !}
+
+        # Force the usage of XDG directories for this user.
+      xdg: true
+{!- endif !}
+
+{!- if has_completions !}
+
+        # Put shell completions into this directory, relative to user home.
+      completions: '.config/zsh/completions'
+{!- endif !}
+
+{!- if has_configsync !}
+
+        # Sync this user's config from a dotfiles repo.
+        # The available paths and their priority can be found in the
+        # rendered `config/sync.sls` file (currently, @TODO docs).
+        # Overview in descending priority:
+        # salt://dotconfig/<minion_id>/<user>/{= xdg_dirname =}
+        # salt://dotconfig/<minion_id>/{= xdg_dirname =}
+        # salt://dotconfig/<os_family>/<user>/{= xdg_dirname =}
+        # salt://dotconfig/<os_family>/{= xdg_dirname =}
+        # salt://dotconfig/default/<user>/{= xdg_dirname =}
+        # salt://dotconfig/default/{= xdg_dirname =}
+      dotconfig:              # can be bool or mapping
+        file_mode: '0600'     # default: keep destination or salt umask (new)
+        dir_mode: '0700'      # default: 0700
+        clean: false          # delete files in target. default: false
+{!- endif !}
+
+        # Persist environment variables used by this formula for this
+        # user to this file (will be appended to a file relative to $HOME)
+      persistenv: '.config/zsh/zshenv'
+
+        # Add runcom hooks specific to this formula to this file
+        # for this user (will be appended to a file relative to $HOME)
+      rchook: '.config/zsh/zshrc'
+
+{!- if user_settings !}
+
+        # This user's configuration for this formula. Will be overridden by
+        # user-specific configuration in `tool_{= abbr_pysafe =}:users`.
+        # Set this to `false` to disable configuration for this user.
+      {= abbr_pysafe =}:
+        {= user_settings | yaml(False) | indent(8) =}
+{!- endif !}
+
+tool_{= abbr_pysafe =}:
+
+    # Specify an explicit version (works on most Linux distributions) or
+    # keep the packages updated to their latest version on subsequent runs
+    # by leaving version empty or setting it to 'latest'
+    # (again for Linux, brew does that anyways).
+  version: latest
+
+{!- if settings !}
+  {= settings | yaml(False) | indent(2) =}
+{!- endif !}
+
+{!- if user_settings !}
+
+    # Default formula configuration for all users.
+  defaults:
+    {= user_settings | first =}: default value for all users
+{!- endif !}
+
+    # User configuration can also be specified here in
+    # `tool_{= abbr_pysafe =}:users`. It will override
+    # configuration sourced from `tool_global:users`.
+  users:
+    user:
+      persistenv: '.bash_profile'
+{!- if user_settings !}
+      {= service_abbr =}:
+        {= user_settings | first =}: this overrides config from tool_globl:users
+{!- endif !}
+
+######################################################################
+# The following settings define default values for this formula,
+# depending on different grains. You should not have to modify them
+# in most cases. For a full overview, see the different files
+# in `parameters`.
+######################################################################
+  lookup:
+    pkg:
+      name: {= pkg =}
+{!- if 'pkg' in lookup !}
+      {= lookup.pkg | yaml(False) | indent(6) =}
+{!- endif !}
+{!- if needs_repo !}
+      enable_repo:
+        - stable
+{!- endif !}
+    rootgroup: root
+    paths:
+      confdir: '{= default_confdir =}'
+      conffile: '{= default_conffile =}'
+{!- if needs_xdg_help or has_xdg !}
+      xdg_dirname: '{= xdg_dirname =}'
+      xdg_conffile: '{= xdg_conffile =}'
+{!- endif !}
+{!- if 'paths' in lookup !}
+      {= lookup.paths | yaml(False) | indent(6) =}
+{!- endif !}
+{!- for var, val in lookup.items() !}
+{!-   if var not in ["pkg", "service", "paths"] !}
+    {= {var: val} | yaml(False) | indent(4) =}
+{!-   endif !}
+{!- endfor !}
+
+######################################################################
+# This is where `tool` suite settings end and Salt behavior settings
+# inherited from `salt-formulas/template-formula` start. They will
+# influence how exactly the TOFS pattern is applied. Mind that
+# parts of this are disabled for `configsync.sls`.
+######################################################################
+  tofs:
+    # The files_switch key serves as a selector for alternative
+    # directories under the formula files directory. See TOFS pattern
+    # doc for more info.
+    # Note: Any value not evaluated by `config.get` will be used literally.
+    # This can be used to set custom paths, as many levels deep as required.
+    files_switch:
+      - any/path/can/be/used/here
+      - id
+      - roles
+      - osfinger
+      - os
+      - os_family
+
+{!- if has_config_template !}
+
+    # All aspects of path/file resolution are customisable using the options below.
+    # This is unnecessary in most cases; there are sensible defaults.
+    # Default path: salt://< path_prefix >/< dirs.files >/< dirs.default >
+    # I.e.: salt://tool_{= abbr_pysafe =}/files/default
+    # path_prefix: template_alt
+    # dirs:
+    #   files: files_alt
+    #   default: default_alt
+    # The entries under `source_files` are prepended to the default source files
+    # given for the state
+    source_files:
+      {= service_name =} config file is managed for user 'user':
+        - '{= xdg_conffile =}'
+        - '{= xdg_conffile =}.jinja'
+{!- endif !}

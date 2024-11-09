@@ -1,0 +1,219 @@
+---
+pkg:
+  type: str
+  help: >
+    The name of the package to install. Leave empty to skip.
+  placeholder: git
+  default: '{= service_abbr =}'
+  when: '{= flavor == "app" =}'
+
+extmods:
+  type: str
+  help: Include custom modules in the formula
+  default: []
+  choices:
+    - auth
+    - beacon
+    - cache
+    - cloud
+    - engine
+    - execution
+    - executor
+    - fileserver
+    - grain
+    - log_handler
+    - matcher
+    - metaproxy
+    - netapi
+    - output
+    - pillar
+    - pkgdb
+    - pkgfile
+    - proxy
+    - queue
+    - renderer
+    - returner
+    - roster
+    - runner
+    - sdb
+    - serializer
+    - state
+    - thorium
+    - token
+    - top
+    - wheel
+    - wrapper
+  multiselect: true
+  when: '{= flavor == "app" =}'
+
+needs_repo:
+  type: bool
+  help: >
+    Whether the package installation relies on custom repositories.
+  default: false
+  when: '{= flavor == "app" =}'
+
+has_service:
+  type: bool
+  help: >
+    Whether the application provides a daemon to be managed.
+  default: false
+  when: '{= flavor == "app" =}'
+
+mac_library:
+  type: bool
+  help: >
+    Whether on MacOS, the default configuration lives in `~/Library/Application Support`.
+  default: true
+  when: '{= flavor == "app" =}'
+
+mac_cask:
+  type: bool
+  help: >
+    Whether on MacOS, the package is a cask.
+  default: true
+  when: '{= flavor == "app" =}'
+
+has_xdg:
+  type: bool
+  help: >
+    Whether the formula should have some kind of XDG spec support.
+  default: true
+  when: '{= flavor == "app" =}'
+
+needs_xdg_help:
+  type: bool
+  help: >
+    If the program does not respect the XDG spec, whether you
+    will provide a way to migrate the data and enforce complicance.
+  default: false
+  when: '{= has_xdg and flavor == "app" =}'
+
+has_conffile_only:
+  type: bool
+  help: >
+    If the program only has a configuration file (e.g. `.gitconfig`).
+  default: false
+  when: '{= flavor == "app" =}'
+
+default_confdir:
+  type: str
+  help: >
+    The default configuration directory on Linux. Leave empty for `$HOME`.
+  default: >-
+    {!- if not has_conffile_only !}
+    {!-   if has_xdg and not needs_xdg_help !}
+    {=- ".config/" ~ pkg -=}
+    {!-   else !}
+    {=- "." ~ pkg -=}
+    {!-   endif !}
+    {!- endif !}
+  when: '{= not has_conffile_only and flavor == "app" =}'
+  validator: >
+    {!- if (default_confdir | trim) != default_confdir !}
+    No leading/trailing whitespace
+    {!- endif !}
+
+default_confdir_mac:
+  type: str
+  help: >
+    The default configuration directory on MacOS. Leave empty for `$HOME`.
+  default: >-
+    {!- if not has_conffile_only !}
+    {!-   if mac_library !}
+    {=- "Library/Application Support/" ~ service_name -=}
+    {!-   else !}
+    {=- default_confdir -=}
+    {!-   endif !}
+    {!- endif !}
+  when: '{= flavor == "app" =}'
+  validator: >
+    {!- if (default_confdir_mac | trim) != default_confdir_mac !}
+    No leading/trailing whitespace
+    {!- endif !}
+
+default_conffile:
+  type: str
+  help: >
+    The name of the default configuration file. Example: `.gitconfig`.
+  default: >-
+    {!- if not has_conffile_only or not needs_xdg_help !}
+    {=- "config" -=}
+    {!- else !}
+    {=- "." ~ pkg -=}
+    {!- endif !}
+  when: '{= flavor == "app" =}'
+  validator: >
+    {!- if (default_conffile | trim) != default_conffile !}
+    No leading/trailing whitespace
+    {!- endif !}
+
+xdg_dirname:
+  type: str
+  help: >
+    The name of the directory in XDG dirs for this app (e.g. `git`).
+  default: >-
+    {!- if has_xdg !}
+    {=- pkg -=}
+    {!-   else !}
+    {=- default_confdir[8:] -=}
+    {!- endif !}
+  when: '{= has_xdg and flavor == "app" =}'
+  validator: >
+    {!- if (xdg_dirname | trim) != xdg_dirname !}
+    No leading/trailing whitespace
+    {!- endif !}
+
+xdg_conffile:
+  type: str
+  help: >
+    The name of the configuration file inside `~/.config/<xdg_dirname>`. Example: `config`.
+  default: >-
+    {!- if has_xdg !}
+    {=- default_conffile.lstrip(".") -=}
+    {!- endif !}
+  when: '{= has_xdg and flavor == "app" =}'
+  validator: >
+    {!- if (xdg_conffile | trim) != xdg_conffile !}
+    No leading/trailing whitespace
+    {!- endif !}
+
+has_configsync:
+  type: bool
+  help: >
+    Whether the formula provides automatic syncing of configuration files from a dotfiles repository.
+  default: true
+  when: '{= flavor == "app" =}'
+
+has_config_template:
+  type: bool
+  help: >
+    Whether the formula provides a way to serialize parameters into the program's config file.
+  default: false
+  when: '{= flavor == "app" =}'
+
+has_completions:
+  type: bool
+  help: >
+    Whether the formula provides a way to install shell completions for the program.
+  default: false
+  when: '{= flavor == "app" =}'
+
+has_tests:
+  type: bool
+  help: >
+    Whether the formula should have test boilerplate code. This is only provided for Linux at the moment, so MacOS-only formulae should answer `n` here.
+  default: true
+  when: '{= flavor == "app" =}'
+
+user_settings:
+  type: yaml
+  multiline: true
+  help: >
+    An arbitrarily nested mapping/dictionary that describes per-user parameters
+    for the formula. Examples include a list of plugins to install or user
+    configuration for the managed app.
+  validator: >-
+    {!- if user_settings is not mapping !}Must be a mapping{!- endif !}
+  default: '{}'
+  when: '{= flavor == "app" =}'

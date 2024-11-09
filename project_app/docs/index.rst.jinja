@@ -1,0 +1,29 @@
+{!- set h = 'Welcome to salt-tool-' ~ service_abbr ~ '-formula\'s documentation!' -!}
+{= h =}
+{= '=' * h | length =}
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   README
+   toolsuite
+   states
+   pillar
+{!- if "execution" in extmods and "state" in extmods !}
+   modules_execution/index
+   modules_state/index
+{!- endif !}
+   map.jinja
+   TOFS_pattern
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+{!- if extmods or true !}
+* :ref:`modindex`
+{!- endif !}
+* :ref:`search`

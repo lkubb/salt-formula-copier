@@ -1,0 +1,21 @@
+# vim: ft=sls
+
+{#-
+    Manages the {= service_name =} {= "service" if has_service else "package" =} configuration by
+{! if has_configsync !}
+    * recursively syncing from a dotfiles repo
+{!- endif -!}
+{! if has_config_template !}
+    * managing/serializing the config file{! if has_configsync !} afterwards{! endif !}
+{!- endif !}
+
+    Has a dependency on `tool_{= abbr_pysafe =}.package`_.
+#}
+
+include:
+{!- if has_configsync !}
+  - .sync
+{!- endif !}
+{!- if has_config_template !}
+  - .file
+{!- endif !}

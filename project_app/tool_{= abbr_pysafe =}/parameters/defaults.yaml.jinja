@@ -1,0 +1,42 @@
+# vim: ft=yaml
+#
+# Set default values.
+---
+values:
+  lookup:
+    pkg:
+      name: {= pkg =}
+{!- if "pkg" in lookup !}
+      {= lookup.pkg | yaml(False) | indent(6) =}
+{!- endif !}
+{!- if needs_repo !}
+      enable_repo:
+        - stable
+{!- endif !}
+    paths:
+      confdir: '{= default_confdir =}'
+      conffile: '{= default_conffile =}'
+{!- if needs_xdg_help or has_xdg !}
+      xdg_dirname: '{= xdg_dirname =}'
+      xdg_conffile: '{= xdg_conffile =}'
+{!- endif !}
+{!- if "paths" in lookup !}
+      {= lookup.paths | yaml(False) | indent(6) =}
+{!- endif !}
+    rootgroup: root
+{!- if has_service !}
+    service:
+      name: {= pkg =}
+{!-   if "service" in lookup !}
+      {= lookup.service | yaml(False) | indent(6) =}
+{!-   endif !}
+{!- endif !}
+{!- for var, val in lookup.items() !}
+{!-   if var not in ["pkg", "service", "paths"] !}
+    {= {var: val} | yaml(False) | indent(4) =}
+{!-   endif !}
+{!- endfor !}
+  # Just here for testing
+  added_in_defaults: defaults_value
+  winner: defaults
+...

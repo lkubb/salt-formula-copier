@@ -1,0 +1,82 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+
+include:
+  - {{ tplroot }}.package
+
+
+{%- for user in {= abbr_pysafe =}.users | rejectattr("xdg", "sameas", false) %}
+
+{%-   set user_default_conf = user.home | path_join({= abbr_pysafe =}.lookup.paths.confdir{! if has_conffile_only !}, {= abbr_pysafe =}.lookup.paths.conffile{! endif !}) %}
+{%-   set user_xdg_confdir = user.xdg.config | path_join({= abbr_pysafe =}.lookup.paths.xdg_dirname) %}
+{%-   set user_xdg_conffile = user_xdg_confdir | path_join({= abbr_pysafe =}.lookup.paths.xdg_conffile) %}
+
+# workaround for file.rename not supporting user/group/mode for makedirs
+{= service_name =} has its config dir in XDG_CONFIG_HOME for user '{{ user.name }}':
+  file.directory:
+    - name: {{ {= "user_xdg_confdir" if has_conffile_only else "user.xdg.config" =} }}
+    - user: {{ user.name }}
+    - group: {{ user.group }}
+    - mode: '0700'
+    - makedirs: true
+    - onlyif:
+      - test -e '{{ user_default_conf }}'
+
+Existing {= service_name =} configuration is migrated for user '{{ user.name }}':
+  file.rename:
+    - name: {{ {= "user_xdg_confdir" if not has_conffile_only else "user_xdg_conffile" =} }}
+    - source: {{ user_default_conf }}
+    - require:
+      - {= service_name =} has its config dir in XDG_CONFIG_HOME for user '{{ user.name }}'
+    - require_in:
+      - {= service_name =} setup is completed
+
+{= service_name =} has its config file in XDG_CONFIG_HOME for user '{{ user.name }}':
+  file.managed:
+    - name: {{ user_xdg_conffile }}
+    - user: {{ user.name }}
+    - group: {{ user.group }}
+    - replace: false
+    - makedirs: true
+    - mode: '0600'
+    - dir_mode: '0700'
+    - require:
+      - Existing {= service_name =} configuration is migrated for user '{{ user.name }}'
+    - require_in:
+      - {= service_name =} setup is completed
+
+# @FIXME
+# This actually does not make sense and might be harmful:
+# Each file is executed for all users, thus this breaks
+# when more than one is defined!
+{= service_name =} uses XDG dirs during this salt run:
+  environ.setenv:
+    - value:
+        CONF: {{ user_xdg_conffile }}
+    - require_in:
+      - {= service_name =} setup is completed
+
+{%-   if user.get("persistenv") %}
+
+persistenv file for {= service_name =} exists for user '{{ user.name }}':
+  file.managed:
+    - name: {{ user.home | path_join(user.persistenv) }}
+    - user: {{ user.name }}
+    - group: {{ user.group }}
+    - replace: false
+    - mode: '0600'
+    - dir_mode: '0700'
+    - makedirs: true
+
+{= service_name =} knows about XDG location for user '{{ user.name }}':
+  file.append:
+    - name: {{ user.home | path_join(user.persistenv) }}
+    - text: export CONF="${XDG_CONFIG_HOME:-$HOME/.config}/{{ {= abbr_pysafe =}.lookup.paths.xdg_dirname | path_join({= abbr_pysafe =}.lookup.paths.xdg_conffile) }}"
+    - require:
+      - persistenv file for {= service_name =} exists for user '{{ user.name }}'
+    - require_in:
+      - {= service_name =} setup is completed
+{%-   endif %}
+{%- endfor %}

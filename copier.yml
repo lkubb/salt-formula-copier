@@ -12,6 +12,7 @@ flavor:
   choices:
     General: general
     Compose: compose
+    Application: app
   when: '{= init_questions =}'
   default: general
 
@@ -53,6 +54,8 @@ abbr_pysafe:
 !include questions/flavor_general.yml
 ---
 !include questions/flavor_compose.yml
+---
+!include questions/flavor_app.yml
 ---
 author:
   type: str
