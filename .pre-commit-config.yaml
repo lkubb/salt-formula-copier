@@ -11,13 +11,19 @@ repos:
       - id: mixed-line-ending
         args:
           - --fix=lf
-        exclude: '^project/docs/make.bat$'
+        exclude: '.*\.bat$'
       - id: end-of-file-fixer
-        exclude: '^project/docs/states.rst$'
+        exclude: '^\w+/docs/states\.rst$'
       - id: check-merge-conflict
         args:
           - --assume-in-merge
       - id: check-yaml
+        exclude: '^copier\.yml$'
+      - id: check-yaml
+        name: check copier.yml
+        files: '^copier\.yml$'
+        args:
+          - --unsafe
       - id: check-ast
       - id: check-builtin-literals
       - id: debug-statements

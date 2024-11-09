@@ -5,6 +5,7 @@ A [Copier][copier-repo] template that initializes a project structure for develo
 It's an opinionated variant of the [official template-formula][template-formula] and began its life as a [Cookiecutter/Cruft template][cruft-template].
 
 ## Migration from previous template
+### `salt-template-formula`
 Template version `0.0.1` is identical to the last Cruft template.
 Expect this template to diverge significantly from the `template-formula` in future releases.
 
