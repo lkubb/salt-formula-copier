@@ -1,0 +1,118 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+{%- from tplroot ~ "/libtofsstack.jinja" import files_switch with context %}
+
+{= service_name =} user account is present:
+  user.present:
+{%- for param, val in {= abbr_pysafe =}.lookup.user.items() %}
+{%-   if val is not none and param != "groups" %}
+    - {{ param }}: {{ val }}
+{%-   endif %}
+{%- endfor %}
+    - usergroup: true
+    - createhome: true
+    - groups: {{ {= abbr_pysafe =}.lookup.user.groups | json }}
+    # (on Debian 11) subuid/subgid are only added automatically for non-system users
+    - system: false
+  file.append:
+    - names:
+      - {{ {= abbr_pysafe =}.lookup.user.home | path_join(".bashrc") }}:
+        - text:
+          - export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          - export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
+
+      - {{ {= abbr_pysafe =}.lookup.user.home | path_join(".bash_profile") }}:
+        - text: |
+            if [ -f ~/.bashrc ]; then
+              . ~/.bashrc
+            fi
+
+    - require:
+      - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+
+{= service_name =} user session is initialized at boot:
+  compose.lingering_managed:
+    - name: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - enable: {{ {= abbr_pysafe =}.install.rootless }}
+    - require:
+      - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+
+{= service_name =} paths are present:
+  file.directory:
+    - names:
+      - {{ {= abbr_pysafe =}.lookup.paths.base }}
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - group: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - makedirs: true
+    - require:
+      - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+
+{%- if {= abbr_pysafe =}.install.podman_api %}
+
+{= service_name =} podman API is enabled:
+  compose.systemd_service_enabled:
+    - name: podman.socket
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - require:
+      - {= service_name =} user session is initialized at boot
+
+{= service_name =} podman API is available:
+  compose.systemd_service_running:
+    - name: podman.socket
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - require:
+      - {= service_name =} user session is initialized at boot
+{%- endif %}
+
+{= service_name =} compose file is managed:
+  file.managed:
+    - name: {{ {= abbr_pysafe =}.lookup.paths.compose }}
+    - source: {{ files_switch(
+                    ["docker-compose.yml", "docker-compose.yml.j2"],
+                    config={= abbr_pysafe =},
+                    lookup="{= service_name =} compose file is present",
+                 )
+              }}
+    - mode: '0644'
+    - user: root
+    - group: {{ {= abbr_pysafe =}.lookup.rootgroup }}
+    - makedirs: true
+    - template: jinja
+    - makedirs: true
+    - context:
+        {= abbr_pysafe =}: {{ {= abbr_pysafe =} | json }}
+
+{= service_name =} is installed:
+  compose.installed:
+    - name: {{ {= abbr_pysafe =}.lookup.paths.compose }}
+{%- for param, val in {= abbr_pysafe =}.lookup.compose.items() %}
+{%-   if val is not none and param != "service" %}
+    - {{ param }}: {{ val }}
+{%-   endif %}
+{%- endfor %}
+{%- for param, val in {= abbr_pysafe =}.lookup.compose.service.items() %}
+{%-   if val is not none %}
+    - {{ param }}: {{ val }}
+{%-   endif %}
+{%- endfor %}
+    - watch:
+      - file: {{ {= abbr_pysafe =}.lookup.paths.compose }}
+{%- if {= abbr_pysafe =}.install.rootless %}
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+    - require:
+      - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+{%- endif %}
+
+{%- if {= abbr_pysafe =}.install.autoupdate_service is not none %}
+
+Podman autoupdate service is managed for {= service_name =}:
+{%-   if {= abbr_pysafe =}.install.rootless %}
+  compose.systemd_service_{{ "enabled" if {= abbr_pysafe =}.install.autoupdate_service else "disabled" }}:
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+{%-   else %}
+  service.{{ "enabled" if {= abbr_pysafe =}.install.autoupdate_service else "disabled" }}:
+{%-   endif %}
+    - name: podman-auto-update.timer
+{%- endif %}

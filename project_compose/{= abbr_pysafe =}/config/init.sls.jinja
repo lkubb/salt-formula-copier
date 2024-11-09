@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Manages the configuration of the {= ", ".join(containers.split(",")) =} containers.
+    Has a dependency on `{= abbr_pysafe =}.package`_.
+#}
+
+include:
+  - .file

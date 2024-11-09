@@ -34,6 +34,27 @@ You should then immediately update (at least to version `0.0.2`, which excludes 
 copier update --trust --skip-answered  # --vcs-ref=0.0.2
 ```
 
+### `salt-template-formula-compose`
+For projects generated from the [compose template-formula][cruft-compose], you can follow similar steps as documented for `salt-template-formula`.
+In general, substitute `0.0.1` with `0.0.3` and `0.0.2` with `0.0.4`.
+Use the following command:
+
+```bash
+jq '.context.cookiecutter |
+    with_entries(select(.key | test("^[^_]"))) |
+    with_entries(.key |=
+        if . == "name" then "service_name"
+        elif . == "abbr" then "service_abbr"
+        elif . == "git_username" then "author"
+        else . end)
+' .cruft.json > tmp_copier_answers && \
+copier copy --trust --vcs-ref=0.0.3 https://github.com/lkubb/salt-formula-copier --data flavor=compose --data-file=tmp_copier_answers --skip \* . && \
+git add --intent-to-add .copier-answers.yml && \
+git clean -ffd && \
+rm -f .cruft.json && \
+git commit --no-verify -am "Migrate to Copier template"; rm -f tmp_copier_answers
+```
+
 ## Acknowledgement
 This project is heavily based on the excellent work done in [saltstackformulas/template-formula][template-formula].
 
@@ -45,3 +66,4 @@ This project is heavily based on the excellent work done in [saltstackformulas/t
 [copier-docs]: https://copier.readthedocs.io/en/stable/
 [template-formula]: https://github.com/saltstack-formulas/template-formula
 [cruft-template]: https://github.com/lkubb/salt-template-formula
+[cruft-compose]: https://github.com/lkubb/salt-template-formula-compose

@@ -1,0 +1,37 @@
+# vim: ft=sls
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- set sls_config_file = tplroot ~ ".config.file" %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+
+include:
+  - {{ sls_config_file }}
+
+{= service_name =} service is enabled:
+  compose.enabled:
+    - name: {{ {= abbr_pysafe =}.lookup.paths.compose }}
+{%- for param in ["project_name", "container_prefix", "pod_prefix", "separator"] %}
+{%-   if {= abbr_pysafe =}.lookup.compose.get(param) is not none %}
+    - {{ param }}: {{ {= abbr_pysafe =}.lookup.compose[param] }}
+{%-   endif %}
+{%- endfor %}
+    - require:
+      - {= service_name =} is installed
+{%- if {= abbr_pysafe =}.install.rootless %}
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+{%- endif %}
+
+{= service_name =} service is running:
+  compose.running:
+    - name: {{ {= abbr_pysafe =}.lookup.paths.compose }}
+{%- for param in ["project_name", "container_prefix", "pod_prefix", "separator"] %}
+{%-   if {= abbr_pysafe =}.lookup.compose.get(param) is not none %}
+    - {{ param }}: {{ {= abbr_pysafe =}.lookup.compose[param] }}
+{%-   endif %}
+{%- endfor %}
+{%- if {= abbr_pysafe =}.install.rootless %}
+    - user: {{ {= abbr_pysafe =}.lookup.user.name }}
+{%- endif %}
+    - watch:
+      - {= service_name =} is installed
+      - sls: {{ sls_config_file }}

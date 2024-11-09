@@ -11,6 +11,7 @@ flavor:
   help: Choose which template flavour to base the project on. Cannot be changed later.
   choices:
     General: general
+    Compose: compose
   when: '{= init_questions =}'
   default: general
 
@@ -40,7 +41,7 @@ abbr_pysafe:
   help: >
     A short and pythonic version of `service_name`.
   placeholder: gitea
-  default: '{= service_abbr | regex_replace("\W", "_") =}'
+  default: '{= service_abbr | lower | regex_replace("\W", "_") =}'
   validator: >-
     {!- if not abbr_pysafe !}
     Cannot be empty.
@@ -50,6 +51,8 @@ abbr_pysafe:
     {!- endif !}
 ---
 !include questions/flavor_general.yml
+---
+!include questions/flavor_compose.yml
 ---
 author:
   type: str

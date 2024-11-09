@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Installs the {= ", ".join(containers.split(",")) =} containers only.
+    This includes creating systemd service units.
+#}
+
+include:
+  - .install
