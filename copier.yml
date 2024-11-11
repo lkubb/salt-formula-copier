@@ -6,15 +6,23 @@ init_questions:
   default: "{= initialized is not defined or initialized is false =}"
   when: false
 
-flavor:
+flavor_init:
   type: str
-  help: Choose which template flavour to base the project on. Cannot be changed later.
+  help: Choose which template flavor to base the project on. Cannot be changed later.
   choices:
     General: general
     Compose: compose
     Application: app
   when: '{= init_questions =}'
-  default: general
+
+flavor:
+  type: str
+  choices:
+    General: general
+    Compose: compose
+    Application: app
+  when: false
+  default: '{= flavor_recorded if flavor_recorded is defined else flavor_init =}'
 
 service_name:
   type: str

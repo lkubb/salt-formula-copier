@@ -28,15 +28,15 @@ rm -f .cruft.json && \
 git commit --no-verify -am "Migrate to Copier template"; rm -f tmp_copier_answers
 ```
 
-You should then immediately update (at least to version `0.0.2`, which excludes `.copier-answers.yml` from pre-commit YAML linting, but leaves everything else as before)
+You should then immediately update (at least to version `0.0.7`, which excludes `.copier-answers.yml` from pre-commit YAML linting, but leaves everything else as before).
+Choose `general` as the template flavor when updating.
 
 ```bash
-copier update --trust --skip-answered  # --vcs-ref=0.0.2
+copier update --trust --skip-answered  # --vcs-ref=0.0.7
 ```
 
 ### `salt-template-formula-compose`
 For projects generated from the [compose template-formula][cruft-compose], you can follow similar steps as documented for `salt-template-formula`.
-In general, substitute `0.0.1` with `0.0.3` and `0.0.2` with `0.0.4`.
 Use the following command:
 
 ```bash
@@ -52,12 +52,21 @@ copier copy --trust --vcs-ref=0.0.3 https://github.com/lkubb/salt-formula-copier
 git add --intent-to-add .copier-answers.yml && \
 git clean -ffd && \
 rm -f .cruft.json && \
+echo "flavor_recorded: compose" >> .copier-answers.yml && \
 git commit --no-verify -am "Migrate to Copier template"; rm -f tmp_copier_answers
+```
+
+Because of a bug in versions <0.0.7, updating from here needs a workaround. Ensure the repo state is completely clean with no untracked files/uncommitted changes before running:
+
+```bash
+copier update --trust --skip-answered --vcs-ref=0.0.7 && \
+git add .copier-answers.yml  .pre-commit-config && \
+git commit -m "Update to template version 0.0.7" && \
+git reset --hard HEAD && git clean -ffd
 ```
 
 ### `salt-tool-template-formula`
 For projects generated from the [tool template-formula][cruft-tool], you can follow similar steps as documented for `salt-template-formula`.
-In general, substitute `0.0.1` with `0.0.5` and `0.0.2` with `0.0.6`.
 Use the following command:
 
 ```bash
@@ -89,7 +98,17 @@ copier copy --trust --vcs-ref=0.0.5 https://github.com/lkubb/salt-formula-copier
 git add --intent-to-add .copier-answers.yml && \
 git clean -ffd && \
 rm -f .cruft.json && \
+echo "flavor_recorded: app" >> .copier-answers.yml && \
 git commit --no-verify -am "Migrate to Copier template"; rm -f tmp_copier_answers
+```
+
+Because of a bug in versions <0.0.7, updating from here needs a workaround. Ensure the repo state is completely clean with no untracked files/uncommitted changes before running:
+
+```bash
+copier update --trust --skip-answered --vcs-ref=0.0.7 && \
+git add .copier-answers.yml .pre-commit-config docs/index.rst && \
+git commit -m "Update to template version 0.0.7" && \
+git reset --hard HEAD && git clean -ffd
 ```
 
 ## Acknowledgement
