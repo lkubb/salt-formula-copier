@@ -28,7 +28,7 @@ service_name:
   type: str
   help: >
     Name of the managed program.
-  placeholder: Gitea
+  placeholder: '{= "Git" if flavor == "app" else "Gitea" =}'
   validator: >-
     {!- if not service_name !}
     Service name cannot be empty.
@@ -58,6 +58,22 @@ abbr_pysafe:
     {!- if not (abbr_pysafe | regex_search("^[a-z][a-z0-9_]+$")) !}
     Must start with a lowercase letter, followed by lowercase letters/digits or underscores.
     {!- endif !}
+---
+# Shared questions flavors
+pkg:
+  type: str
+  help: >
+    The name of the package to install. Leave empty to skip.
+  placeholder: '{= "git" if flavor == "app" else "gitea" =}'
+  default: '{= service_abbr =}'
+  when: '{= flavor in ["general", "app"] =}'
+
+needs_repo:
+  type: bool
+  help: >
+    Whether the package installation relies on custom repositories.
+  default: false
+  when: '{= flavor in ["general", "app"] =}'
 ---
 !include questions/flavor_general.yml
 ---

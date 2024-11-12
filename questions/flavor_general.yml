@@ -1,19 +1,4 @@
 ---
-pkg:
-  type: str
-  help: >
-    The name of the package to install. Leave empty to skip.
-  placeholder: gitea
-  default: '{= service_abbr =}'
-  when: '{= flavor == "general" =}'
-
-needs_repo:
-  type: bool
-  help: >
-    Whether the package installation relies on custom repositories.
-  default: false
-  when: '{= flavor == "general" =}'
-
 config:
   type: str
   help: >

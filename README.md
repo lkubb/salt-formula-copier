@@ -28,8 +28,7 @@ rm -f .cruft.json && \
 git commit --no-verify -am "Migrate to Copier template"; rm -f tmp_copier_answers
 ```
 
-You should then immediately update (at least to version `0.0.7`, which excludes `.copier-answers.yml` from pre-commit YAML linting, but leaves everything else as before).
-Choose `general` as the template flavor when updating.
+You should then immediately update (at least to version `0.0.8`, which excludes `.copier-answers.yml` from pre-commit YAML linting, but leaves everything else as before, and fixes two template bugs). Choose `general` as the template flavor when updating.
 
 ```bash
 copier update --trust --skip-answered  # --vcs-ref=0.0.7

@@ -1,12 +1,4 @@
 ---
-pkg:
-  type: str
-  help: >
-    The name of the package to install. Leave empty to skip.
-  placeholder: git
-  default: '{= service_abbr =}'
-  when: '{= flavor == "app" =}'
-
 extmods:
   type: str
   help: Include custom modules in the formula
@@ -44,13 +36,6 @@ extmods:
     - wheel
     - wrapper
   multiselect: true
-  when: '{= flavor == "app" =}'
-
-needs_repo:
-  type: bool
-  help: >
-    Whether the package installation relies on custom repositories.
-  default: false
   when: '{= flavor == "app" =}'
 
 has_service:
