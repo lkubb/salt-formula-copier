@@ -1,7 +1,1 @@
-.. _pillar.example:
-
-Example Pillar
-==============
-
-.. literalinclude:: ../pillar.example
-    :language: yaml
+../../common/docs/pillar.rst

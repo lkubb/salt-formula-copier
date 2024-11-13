@@ -1,0 +1,31 @@
+{!- set h = "Welcome to {}-formula's documentation!".format(formula_name) -!}
+{= h =}
+{= '=' * h | length =}
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   README
+{!- if flavor == "app" !}
+   toolsuite
+{!- endif !}
+   states
+   pillar
+{!- if flavor == "app" and "execution" in extmods and "state" in extmods !}
+   modules_execution/index
+   modules_state/index
+{!- endif !}
+   map.jinja
+   TOFS_pattern
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+{!- if flavor == "app" and extmods !}
+* :ref:`modindex`
+{!- endif !}
+* :ref:`search`

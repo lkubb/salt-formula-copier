@@ -109,6 +109,58 @@ settings:
     {!- if settings is not mapping !}Must be a mapping{!- endif !}
   default: '{}'
 
+---
+
+# =================================================
+# | Flavor-specific template data to increase DRY |
+# =================================================
+
+mapstack_sources:
+  type: yaml
+  when: false
+  default: |
+    {!- set map_sources = [
+          '"Y:G@osarch"',
+          '"Y:G@os_family"',
+          '"Y:G@os"',
+          '"Y:G@osfinger"',
+        ] !}
+    {!- if flavor == "app" !}
+    {!-   do map_sources.append('"C@tool_global"') !}
+    {!- endif !}
+    {!- do map_sources.extend(['"C@" ~ tplroot', '"Y:G@id"']) !}
+    {= map_sources | to_json  =}
+
+mapstack_dirs:
+  type: yaml
+  when: false
+  default: |
+    {!- set map_dirs = ["formula_param_dir"] !}
+    {!- if flavor == "app" !}
+    {!-   do map_dirs.insert(0, '"tool_global/parameters"') !}
+    {!- endif !}
+    {= map_dirs | to_json  =}
+
+name_prefix:
+  type: str
+  when: false
+  default: '{!- if flavor == "app" !}tool-{!- endif !}'
+
+name_prefix_pysafe:
+  type: str
+  when: false
+  default: '{= name_prefix | replace("-", "_") =}'
+
+state_root:
+  type: str
+  when: false
+  default: '{= name_prefix_pysafe ~ abbr_pysafe =}'
+
+formula_name:
+  type: str
+  when: false
+  default: '{= name_prefix ~ service_abbr =}'
+
 # ===========================================
 # | Computed values for less ugly templates |
 # ===========================================

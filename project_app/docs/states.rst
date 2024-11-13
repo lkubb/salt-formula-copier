@@ -1,6 +1,1 @@
-Available States
-================
-
-The following states are found in this formula:
-
-
+../../common/docs/states.rst
