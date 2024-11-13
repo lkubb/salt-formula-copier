@@ -1,0 +1,10 @@
+# vim: ft=sls
+
+{#-
+    Starts the {= ", ".join(containers.split(",")) =} container services
+    and enables them at boot time.
+    Has a dependency on `{= state_root =}.config`_.
+#}
+
+include:
+  - .running

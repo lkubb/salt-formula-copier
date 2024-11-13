@@ -1,0 +1,10 @@
+# vim: ft=sls
+
+{#-
+    Ensures {= service_name =} adheres to the XDG spec
+    as best as possible for all managed users.
+    Has a dependency on `{= state_root =}.package`_.
+#}
+
+include:
+  - .migrated

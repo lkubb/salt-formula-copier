@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Starts the {= abbr_pysafe =} service and enables it at boot time.
+    Has a dependency on `{= state_root =}.{= "config" if config else "package" =}`_.
+#}
+
+include:
+  - .running

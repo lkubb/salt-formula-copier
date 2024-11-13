@@ -1,0 +1,36 @@
+# vim: ft=sls
+
+{#-
+    Manages the {= service_name =} {= "service" if has_service else "package" =} configuration.
+    Has a dependency on `{= state_root =}.package`_.
+#}
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{%- set sls_package_install = tplroot ~ ".package.install" %}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+{%- from tplroot ~ "/libtofs.jinja" import files_switch with context %}
+
+include:
+  - {{ sls_package_install }}
+
+
+{%- for user in {= abbr_pysafe =}.users | selectattr("{= abbr_pysafe =}.config", "defined") | selectattr("{= abbr_pysafe =}.config") %}
+
+{= service_name =} config file is managed for user '{{ user.name }}':
+  file.managed:
+    - name: {{ user["_{= abbr_pysafe =}"].conffile }}
+    - source: {{ files_switch([{= abbr_pysafe =}.lookup.paths.conffile],
+                              lookup="{= service_name =} config file is managed for user '{}'".format(user.name),
+                              opt_prefixes=[user.name])
+              }}
+    - mode: '0600'
+    - user: {{ user.name }}
+    - group: {{ user.group }}
+    - makedirs: true
+    - dir_mode: '0700'
+    - template: jinja
+    - require:
+      - sls: {{ sls_package_install }}
+    - context:
+        user: {{ user | json }}
+{%- endfor %}

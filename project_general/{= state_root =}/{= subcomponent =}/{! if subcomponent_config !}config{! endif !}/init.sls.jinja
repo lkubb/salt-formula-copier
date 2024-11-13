@@ -1,0 +1,8 @@
+# vim: ft=sls
+
+{#-
+    Configures the {= abbr_pysafe =} {= subcomponent =} subcomponent{! if config !} and has a
+    dependency on `{= state_root =}.config`_ via include list{! endif !}.
+#}
+include:
+  - .file

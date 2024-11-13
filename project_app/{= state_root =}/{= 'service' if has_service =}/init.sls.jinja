@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Starts the {= service_name =} service and enables it at boot time.
+    Has a dependency on `{= state_root =}.{= "config" if has_config_template or has_configsync else "package" =}`_.
+#}
+
+include:
+  - .running

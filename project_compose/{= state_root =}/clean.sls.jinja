@@ -1,0 +1,14 @@
+# vim: ft=sls
+
+{#-
+    *Meta-state*.
+
+    Undoes everything performed in the ``{= state_root =}`` meta-state
+    in reverse order, i.e. stops the {= ", ".join(containers.split(",")) =} services,
+    removes their configuration and then removes their containers.
+#}
+
+include:
+  - .service.clean
+  - .config.clean
+  - .package.clean

@@ -1,0 +1,13 @@
+# vim: ft=sls
+
+{#-
+    Undoes everything performed in `{= state_root =}.{= subcomponent =}`_ in reverse order, i. e.
+    removes the {= abbr_pysafe =} {= subcomponent =} configuration.
+#}
+
+include:
+{!- if subcomponent_config !}
+  - .config.clean
+{!- else !}
+  []
+{!- endif !}

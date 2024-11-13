@@ -10,7 +10,7 @@ Manages {= service_name =} in the user environment.
 
 Usage
 -----
-Applying ``tool_{= abbr_pysafe =}`` will make sure ``{= service_abbr =}`` is configured as specified.
+Applying ``{= state_root =}`` will make sure ``{= service_abbr =}`` is configured as specified.
 
 {!- if "execution" in extmods and "state" in extmods !}
 
@@ -28,9 +28,9 @@ The general configuration structure is in line with all other formulae from the 
 
 User-specific
 ^^^^^^^^^^^^^
-The following shows an example of ``tool_{= service_abbr =}`` per-user configuration. If provided by pillar, namespace it to ``tool_global:users`` and/or ``tool_{= abbr_pysafe =}:users``. For the ``parameters`` YAML file variant, it needs to be nested under a ``values`` parent key. The YAML files are expected to be found in
+The following shows an example of ``{= state_root =}`` per-user configuration. If provided by pillar, namespace it to ``tool_global:users`` and/or ``{= state_root =}:users``. For the ``parameters`` YAML file variant, it needs to be nested under a ``values`` parent key. The YAML files are expected to be found in
 
-1. ``salt://tool_{= abbr_pysafe =}/parameters/<grain>/<value>.yaml`` or
+1. ``salt://{= state_root =}/parameters/<grain>/<value>.yaml`` or
 2. ``salt://tool_global/parameters/<grain>/<value>.yaml``.
 
 .. code-block:: yaml
@@ -77,9 +77,9 @@ The following shows an example of ``tool_{= service_abbr =}`` per-user configura
 {!- if user_settings !}
 
       # This user's configuration for this formula. Will be overridden by
-      # user-specific configuration in `tool_{= abbr_pysafe =}:users`.
+      # user-specific configuration in `{= state_root =}:users`.
       # Set this to `false` to disable configuration for this user.
-    {= abbr_pysafe =}:
+    {= state_root =}:
       {= user_settings | yaml(False) | indent(6) =}
 {!- endif !}
 
@@ -88,7 +88,7 @@ Formula-specific
 
 .. code-block:: yaml
 
-  tool_{= abbr_pysafe =}:
+  {= state_root =}:
 
       # Specify an explicit version (works on most Linux distributions) or
       # keep the packages updated to their latest version on subsequent runs
@@ -118,7 +118,7 @@ This formula serializes configuration into a config file. A default one is provi
 
 Dotfiles
 ~~~~~~~~
-``tool_{= abbr_pysafe =}.config.sync`` will recursively apply templates from
+``{= state_root =}.config.sync`` will recursively apply templates from
 
 * ``salt://dotconfig/<minion_id>/<user>/{= xdg_dirname =}``
 * ``salt://dotconfig/<minion_id>/{= xdg_dirname =}``
@@ -193,7 +193,7 @@ e.g. ``debian-9-2019-2-py3``.
 ``bin/kitchen converge``
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Creates the docker instance and runs the ``tool_{= abbr_pysafe =}`` main state, ready for testing.
+Creates the docker instance and runs the ``{= state_root =}`` main state, ready for testing.
 
 ``bin/kitchen verify``
 ^^^^^^^^^^^^^^^^^^^^^^

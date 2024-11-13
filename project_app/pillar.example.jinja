@@ -15,7 +15,7 @@
 
 # Apart from the various source files, there are two independent source trees
 # for user-specific configuration.
-# Generally tool_{= abbr_pysafe =} > tool_global.
+# Generally {= state_root =} > tool_global.
 # `tool_global` focuses on specific users, of which most values
 # will be respected by all formulae in the `tool` suite:
 tool_global:
@@ -65,13 +65,13 @@ tool_global:
 {!- if user_settings !}
 
         # This user's configuration for this formula. Will be overridden by
-        # user-specific configuration in `tool_{= abbr_pysafe =}:users`.
+        # user-specific configuration in `{= state_root =}:users`.
         # Set this to `false` to disable configuration for this user.
       {= abbr_pysafe =}:
         {= user_settings | yaml(False) | indent(8) =}
 {!- endif !}
 
-tool_{= abbr_pysafe =}:
+{= state_root =}:
 
     # Specify an explicit version (works on most Linux distributions) or
     # keep the packages updated to their latest version on subsequent runs
@@ -91,13 +91,13 @@ tool_{= abbr_pysafe =}:
 {!- endif !}
 
     # User configuration can also be specified here in
-    # `tool_{= abbr_pysafe =}:users`. It will override
+    # `{= state_root =}:users`. It will override
     # configuration sourced from `tool_global:users`.
   users:
     user:
       persistenv: '.bash_profile'
 {!- if user_settings !}
-      {= service_abbr =}:
+      {= abbr_pysafe =}:
         {= user_settings | first =}: this overrides config from tool_globl:users
 {!- endif !}
 
@@ -110,7 +110,7 @@ tool_{= abbr_pysafe =}:
   lookup:
     pkg:
       name: {= pkg =}
-{!- if 'pkg' in lookup !}
+{!- if "pkg" in lookup !}
       {= lookup.pkg | yaml(False) | indent(6) =}
 {!- endif !}
 {!- if needs_repo !}
@@ -125,7 +125,7 @@ tool_{= abbr_pysafe =}:
       xdg_dirname: '{= xdg_dirname =}'
       xdg_conffile: '{= xdg_conffile =}'
 {!- endif !}
-{!- if 'paths' in lookup !}
+{!- if "paths" in lookup !}
       {= lookup.paths | yaml(False) | indent(6) =}
 {!- endif !}
 {!- for var, val in lookup.items() !}
@@ -159,7 +159,7 @@ tool_{= abbr_pysafe =}:
     # All aspects of path/file resolution are customisable using the options below.
     # This is unnecessary in most cases; there are sensible defaults.
     # Default path: salt://< path_prefix >/< dirs.files >/< dirs.default >
-    # I.e.: salt://tool_{= abbr_pysafe =}/files/default
+    # I.e.: salt://{= state_root =}/files/default
     # path_prefix: template_alt
     # dirs:
     #   files: files_alt

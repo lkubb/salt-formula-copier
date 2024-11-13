@@ -1,0 +1,27 @@
+# vim: ft=sls
+
+{#-
+    Removes the configuration of the {= abbr_pysafe =} {= subcomponent =} subcomponent{! if service !}
+    and reloads the {= abbr_pysafe =} service by a dependency on
+    `{= state_root =}.service.running`_ {! endif !}.
+#}
+
+{%- set tplroot = tpldir.split("/")[0] %}
+{!- if service !}
+{%- set sls_service_clean = tplroot ~ ".service.clean" %}
+{!- endif !}
+{%- from tplroot ~ "/map.jinja" import mapdata as {= abbr_pysafe =} with context %}
+
+{!- if service !}
+
+include:
+  - {{ sls_service_clean }}
+{!- endif !}
+
+{= abbr_pysafe =} {= subcomponent =} config is absent:
+  file.absent:
+    - name: {{ {= abbr_pysafe =}.lookup.{= subcomponent =}.config }}
+{!- if service !}
+    - watch_in:
+        - sls: {{ sls_service_clean }}
+{!- endif !}

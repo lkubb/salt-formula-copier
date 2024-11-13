@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Manages the configuration of the {= ", ".join(containers.split(",")) =} containers.
+    Has a dependency on `{= state_root =}.package`_.
+#}
+
+include:
+  - .file

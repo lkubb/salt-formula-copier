@@ -1,0 +1,9 @@
+# vim: ft=sls
+
+{#-
+    Manages the {= abbr_pysafe =} {= 'service' if service else 'package' =} configuration.
+    Has a dependency on `{= state_root =}.package`_.
+#}
+
+include:
+  - .file

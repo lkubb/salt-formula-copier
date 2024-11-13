@@ -12,7 +12,7 @@ provisioner:
   log_level: debug
   salt_install: none
   require_chef: false
-  formula: {= abbr_pysafe =}
+  formula: {= state_root =}
   salt_copy_filter:
     - .kitchen
     - .git
@@ -273,8 +273,8 @@ suites:
       state_top:
         base:
           '*':
-            - {= abbr_pysafe =}._mapdata
-            - {= abbr_pysafe =}
+            - {= state_root =}._mapdata
+            - {= state_root =}
     verifier:
       inspec_tests:
         - path: test/integration/default
