@@ -1,3 +1,9 @@
+{!- macro render_title(text, variables, char="~") !}
+{!-   set title = text.format(*variables) !}
+{=-   title =}
+{= char * title | length -=}
+{!- endmacro -!}
+
 .. _map.jinja:
 
 ``map.jinja``: gather formula configuration values
@@ -72,8 +78,7 @@ Create the file ``/etc/salt/master.d/fileserver.conf`` and restart the ``master`
     ...
 
 
-Create per DNS configuration for ``{= state_root =}`` formula
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{= render_title("Create per DNS configuration for ``{}`` formula", [state_root]) =}
 
 Now, we can provides the per DNS domain name configuration files for the ``{= state_root =}`` formulas under ``/srv/salt/{= state_root =}/parameters/``.
 
@@ -103,8 +108,7 @@ We create another configuration for the DNS domain ``example.com`` in the Jinja 
     ...
 
 
-Create per role configuration for ``{= state_root =}`` formula
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{= render_title("Create per role configuration for ``{}`` formula", [state_root]) =}
 
 Now, we can provides the per role configuration files for the ``{= state_root =}`` formulas under ``/srv/salt/{= state_root =}/parameters/``.
 
@@ -470,7 +474,7 @@ Use formula configuration values in templates
 
 When you need to process salt templates, you should avoid calling `salt['config.get']`_ (or `salt['pillar.get']`_ and `salt['grains.get']`_) directly from the template. All the needed values should be available within the ``mapdata`` variable exported by ``map.jinja``.
 
-Here is an example based on `template-formula/{= state_root =}/config/file.sls`_:
+Here is an example based on `template-formula/TEMPLATE/config/file.sls`_:
 
 .. code-block:: sls
 
