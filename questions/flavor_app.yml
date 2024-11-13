@@ -184,13 +184,6 @@ has_completions:
   default: false
   when: '{= flavor == "app" =}'
 
-has_tests:
-  type: bool
-  help: >
-    Whether the formula should have test boilerplate code. This is only provided for Linux at the moment, so MacOS-only formulae should answer `n` here.
-  default: true
-  when: '{= flavor == "app" =}'
-
 user_settings:
   type: yaml
   multiline: true
