@@ -79,7 +79,7 @@ The following shows an example of ``{= state_root =}`` per-user configuration. I
       # This user's configuration for this formula. Will be overridden by
       # user-specific configuration in `{= state_root =}:users`.
       # Set this to `false` to disable configuration for this user.
-    {= state_root =}:
+    {= abbr_pysafe =}:
       {= user_settings | yaml(False) | indent(6) =}
 {!- endif !}
 
