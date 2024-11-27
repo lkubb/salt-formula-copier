@@ -25,5 +25,5 @@ values:
       name: homebrew/cask/{= pkg =}
 {!- endif !}
       manager: brew
-    rootgroup: {{ salt['cmd.run']("stat -f '%Sg' /dev/console") }}
+    rootgroup: {{ salt["cmd.run"]("stat -f '%Sg' /dev/console") }}
 ...
