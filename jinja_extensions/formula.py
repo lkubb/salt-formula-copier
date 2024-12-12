@@ -287,6 +287,7 @@ def yaml_with_descriptions(
 
     for key, val in settings.items():
         path = delimiter.join(prefix + [key])
+        meta = {}
         if path in descriptions:
             meta = descriptions[path]
             if not isinstance(meta, Mapping):
@@ -307,6 +308,18 @@ def yaml_with_descriptions(
 
         if not isinstance(val, Mapping) or not val:
             add_lines(*dump_yaml({key: val}).splitlines(), cur_prefix=prefix)
+            if (
+                "example" in meta
+                and not val
+                and isinstance(val, (Mapping, Sequence))
+                and not isinstance(val, str)
+            ):
+                example_yaml = dump_yaml(meta["example"]).splitlines()
+                cur_prefix = prefix + [key]
+                add_lines(
+                    *(f"# {line}" for line in example_yaml),
+                    cur_prefix=cur_prefix,
+                )
         else:
             add_lines(f"{key}:", cur_prefix=prefix)
             lines.extend(
