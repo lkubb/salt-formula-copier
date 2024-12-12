@@ -1,0 +1,156 @@
+---
+# =================================================
+# | Flavor-specific settings/lookup defaults      |
+# =================================================
+
+default_settings:
+  type: yaml
+  when: false
+  default: |
+    {!- if flavor == "app" !}
+    version: latest
+    defaults: {}
+    users: {}
+    {!- elif flavor == "compose" !}
+    install:
+      rootless: true
+      autoupdate: true
+      autoupdate_service: false
+      podman_api: true
+      remove_all_data_for_sure: false
+    {!- else !}
+    {}
+    {!- endif !}
+
+default_lookup:
+  type: yaml
+  when: false
+  default: |
+    {!- if flavor == "app" !}
+    pkg:
+      name: {= pkg =}
+    {!-   if needs_repo !}
+      enable_repo:
+        - stable
+    {!-   endif !}
+    rootgroup: root
+    paths:
+      confdir: {= default_confdir =}
+      conffile: {= default_conffile =}
+    {!-   if needs_xdg_help or has_xdg !}
+      xdg_dirname: {= xdg_dirname =}
+      xdg_conffile: {= xdg_conffile =}
+    {!-   endif !}
+
+
+    {!- elif flavor == "compose" !}
+    rootgroup: root
+    compose:
+      create_pod: null
+      pod_args: null
+      project_name: {= project_name =}
+      remove_orphans: true
+      build: false
+      build_args: null
+      pull: false
+      service:
+        container_prefix: null
+        ephemeral: true
+        pod_prefix: null
+        restart_policy: on-failure
+        restart_sec: 2
+        separator: null
+        stop_timeout: null
+    paths:
+      base: /opt/containers/{= project_name =}
+      compose: docker-compose.yml
+    {!-   for cnt in containers.split(",") !}
+      config_{= cnt =}: {= cnt =}.env
+    {!-   endfor !}
+    user:
+      groups: []
+      home: null
+      name: {= project_name =}
+      shell: /usr/sbin/nologin
+      uid: null
+      gid: null
+
+
+    {!- else !}
+    rootgroup: root
+    {!-   if pkg !}
+    pkg:
+      name: {= pkg =}
+    {!-   endif !}
+    {!-   if needs_repo !}
+    enablerepo:
+      stable: true
+    {!-   endif !}
+    {!-   if config !}
+    config: {= config =}
+    {!-   endif !}
+    {!-   if service !}
+    service:
+      name: {= service =}
+    {!-   endif !}
+    {!-   if subcomponent and subcomponent_config !}
+    {= subcomponent =}:
+      config: {= subcomponent_config =}
+    {!-   endif !}
+    {!- endif !}
+
+default_descriptions:
+  type: yaml
+  when: false
+  default: |
+    {!- if flavor == "app" !}
+    version:
+      desc: |
+        Specify an explicit version (works on most Linux distributions) or
+        keep the packages updated to their latest version on subsequent runs
+        by leaving version empty or setting it to 'latest'
+        (again for Linux, brew does that anyways).
+    defaults:
+      desc: Default formula configuration for all users.
+    users:
+      desc: |
+        User configuration can also be specified here in
+        `{= state_root =}:users`. It will override
+        configuration sourced from `tool_global:users`.
+
+    {!- elif flavor == "compose" !}
+    install:rootless:
+      desc: Install rootless containers running as dedicated user.
+    install:autoupdate:
+      desc: |
+        Add autoupdate label to containers, allowing to run
+        podman autoupdate (manually)
+    install:autoupdate_service:
+      desc: |
+        Manage podman-auto-update.timer (auto-autoupdate)
+        (null=do not manage, false=disable, true=enable)
+    install:podman_api:
+      desc: |
+        Also enable the Podman API for the user running the container
+    install:remove_all_data_for_sure:
+      desc: |
+        When applying `clean` states, also remove application data.
+        Setting this to true might incur accidental data loss!
+    {!- else !}
+    {}
+    {!- endif !}
+
+final_settings:
+  type: json
+  when: false
+  default: '{= default_settings | merge(settings) | to_json =}'
+
+final_lookup:
+  type: json
+  when: false
+  default: '{= default_lookup | merge(lookup) | to_json =}'
+
+final_descriptions:
+  type: json
+  when: false
+  default: '{= default_descriptions | merge(settings_descriptions) | to_json =}'

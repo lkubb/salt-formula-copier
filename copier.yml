@@ -157,17 +157,16 @@ settings:
 settings_descriptions:
   type: yaml
   multiline: true
-  placeholder: |
-    foo:
-      desc: Settings for the `foo` submodule
-    foo:bar:
-      desc: Specify bar stuff
+  default: '{}'
   help: >
     Description of `settings` values. Keys are flattened paths, values mappings (with keys: `desc`)
 
 ---
 # Customizable project metadata and docs questions
 !include questions/base_project_meta.yml
+---
+# Default `settings`/`lookup` adjustments per flavor
+!include questions/auto_settings.yml
 ---
 # ========================================
 # | Migrations between template versions |

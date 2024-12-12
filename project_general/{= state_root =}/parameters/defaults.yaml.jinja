@@ -3,32 +3,9 @@
 # Set default values.
 ---
 values:
-  lookup:
-    rootgroup: root
-{!- if pkg and "pkg" not in lookup !}
-    pkg:
-      name: {= pkg =}
-{!- endif !}
-{!- if needs_repo !}
-    enablerepo:
-      stable: true
-{!- endif !}
-{!- if config and "config" not in lookup !}
-    config: '{= config =}'
-{!- endif !}
-{!- if service and "service" not in lookup !}
-    service:
-      name: {= service =}
-{!- endif !}
-{!- if subcomponent and subcomponent not in lookup and subcomponent_config !}
-    {= subcomponent =}:
-      config: {= subcomponent_config =}
-{!- endif !}
-{!- if lookup !}
-    {= lookup | yaml(False) | indent(4) =}
-{!- endif !}
-{!- if settings !}
-  {= settings | yaml(False) | indent(2) =}
+  {= {"lookup": final_lookup} | yaml | indent(2) =}
+{!- if final_settings !}
+  {= final_settings | yaml | indent(2) =}
 {!- endif !}
   tofs:
     files_switch:

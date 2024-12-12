@@ -2,15 +2,12 @@
 # yamllint disable rule:comments-indentation
 ---
 {= state_root =}:
-{!- if settings !}
+{!- if final_settings !}
 
-  {= settings | yaml_with_descriptions(settings_descriptions, extra_comment_indent=2) | indent(2) =}
+  {= final_settings | yaml_with_descriptions(final_descriptions, extra_comment_indent=2) | indent(2) =}
 {!- endif !}
 
-{!- if lookup !}
-
-  {= {"lookup": lookup} | yaml_with_descriptions(settings_descriptions, extra_comment_indent=2) | indent(2) =}
-{!- endif !}
+  {= {"lookup": final_lookup} | yaml_with_descriptions(final_descriptions, extra_comment_indent=2) | indent(2) =}
 
   tofs:
       # The files_switch key serves as a selector for alternative
