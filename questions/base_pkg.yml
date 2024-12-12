@@ -1,0 +1,15 @@
+---
+pkg:
+  type: str
+  help: >
+    The name of the package to install. Leave empty to skip.
+  placeholder: '{= "git" if flavor == "app" else "gitea" =}'
+  default: '{= service_abbr =}'
+  when: '{= flavor in ["general", "app"] =}'
+
+needs_repo:
+  type: bool
+  help: >
+    Whether the package installation relies on custom repositories.
+  default: false
+  when: '{= flavor in ["general", "app"] =}'

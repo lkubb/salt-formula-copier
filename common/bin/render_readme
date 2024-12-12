@@ -2,7 +2,9 @@
 
 # This inserts the rendered state docs into the readme.
 # Avoids issues with rendering the final readme on Gitea etc.
-sed '/<INSERT_STATES>/{
+repo_root="$(git rev-parse --show-toplevel)"
+
+sed -n '/^.. state::/{ N;d; };p' "$repo_root/docs/ref/states.rst" | sed "/<INSERT_STATES>/{
   s/<INSERT_STATES>//g
-  r docs/states.rst
-}' docs/_README.rst.tpl > docs/README.rst
+  r /dev/stdin
+}" "$repo_root/docs/_README.rst.tpl" > "$repo_root/README.rst"

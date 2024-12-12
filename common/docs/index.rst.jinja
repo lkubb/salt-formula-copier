@@ -1,23 +1,59 @@
-{!- set h = "Welcome to {}-formula's documentation!".format(formula_name) -!}
-{= h =}
-{= '=' * h | length =}
+.. include:: ../README.rst
+   :start-after: include-header-start
+   :end-before: include-header-end
+
+Installation
+------------
+
+See the full `SaltStack Formulas installation and usage instructions
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html>`_.
+
+General notes
+-------------
+This formula is based around the :ref:`mapstack <map.jinja>` and :ref:`TOFS <tofs_pattern>` patterns, which make formula configuration very modular. It is highly advised to understand their application when using this formula.
+
+{!- if flavor == "app" !}
+
+It is part of the :ref:`tool suite <toolsuite>`, which follows a common configuration structure.
+{!- endif !}
+
+.. include:: ../README.rst
+   :start-after: include-notes-start
+   :end-before: include-notes-end
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Reference
+   :hidden:
 
-   README
-{!- if flavor == "app" !}
-   toolsuite
+   ref/states
+   ref/configuration
+
+{!- if extmods !}
+
+.. toctree::
+  :maxdepth: 2
+  :caption: Provided Modules
+  :hidden:
+
+  {!   for loader in extmods -!}
+{!-     if loader == "execution" !}
+{!-       set loader = "module" !}
+{!-     endif !}
+  extmods/{= loader.rstrip("s") + ("" if loader in singular_loader_dirs else "s") =}/index
+{!-   endfor !}
 {!- endif !}
-   states
-   pillar
-{!- if flavor == "app" and "execution" in extmods and "state" in extmods !}
-   modules_execution/index
-   modules_state/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Guides
+   :hidden:
+
+  {! if flavor == "app" -!}
+   topics/toolsuite
 {!- endif !}
-   map.jinja
-   TOFS_pattern
+   topics/map.jinja
+   topics/TOFS_pattern
 
 
 
@@ -25,7 +61,7 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-{!- if flavor == "app" and extmods !}
+{!- if extmods !}
 * :ref:`modindex`
 {!- endif !}
 * :ref:`search`

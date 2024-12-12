@@ -1,0 +1,11 @@
+---
+singular_loader_dirs:
+  type: json
+  when: false
+  default: >
+    ["auth", "cache", "fileserver", "metaproxy", "netapi", "output", "pillar", "pkgdb", "proxy", "roster", "sdb", "thorium", "wheel", "wrapper"]
+
+python_requires:
+  type: json
+  when: false
+  default: '[3, 9]'

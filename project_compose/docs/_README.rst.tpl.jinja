@@ -1,4 +1,4 @@
-.. _readme:
+.. include-header-start
 
 {= service_name =} Formula
 {= '=' * service_name | length =}========
@@ -7,41 +7,35 @@
 
 .. |img_sr| image:: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
    :alt: Semantic Release
-   :scale: 100%
    :target: https://github.com/semantic-release/semantic-release
 .. |img_pc| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
    :alt: pre-commit
-   :scale: 100%
    :target: https://github.com/pre-commit/pre-commit
 
-Manage {= service_name =} with Salt and Podman.
+{= description =}.
+
+.. include-header-end
 
 .. contents:: **Table of Contents**
    :depth: 1
 
-General notes
--------------
+Installation
+------------
 
 See the full `SaltStack Formulas installation and usage instructions
 <https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html>`_.
 
-If you are interested in writing or contributing to formulas, please pay attention to the `Writing Formula Section
-<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#writing-formulas>`_.
+General notes
+-------------
+This formula is based around the :ref:`mapstack <map.jinja>` and :ref:`TOFS <tofs_pattern>` patterns, which make formula configuration very modular. It is highly advised to understand their application when using this formula.
 
-If you want to use this formula, please pay attention to the ``FORMULA`` file and/or ``git tag``,
-which contains the currently released version. This formula is versioned according to `Semantic Versioning <http://semver.org/>`_.
-
-See `Formula Versioning Section <https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#versioning>`_ for more details.
-
-If you need (non-default) configuration, please refer to:
-
-- `how to configure the formula with map.jinja <map.jinja.rst>`_
-- the ``pillar.example`` file
-- the `Special notes`_ section
+.. include-notes-start
 
 Special notes
 -------------
 * This formula is written with the custom `compose modules <https://github.com/lkubb/salt-podman-formula>`_ in mind and will not work without them.
+
+.. include-notes-end
 
 Configuration
 -------------
@@ -51,6 +45,9 @@ An example pillar is provided, please see `pillar.example`. Note that you do not
 
 Contributing to this repo
 -------------------------
+
+If you are interested in writing or contributing to formulas, please pay attention to the `Writing Formula Section
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#writing-formulas>`_.
 
 Commit messages
 ^^^^^^^^^^^^^^^

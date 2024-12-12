@@ -4,13 +4,12 @@
 {= state_root =}:
 {!- if settings !}
 
-  {= settings | yaml(False) | indent(2) =}
+  {= settings | yaml_with_descriptions(settings_descriptions, extra_comment_indent=2) | indent(2) =}
 {!- endif !}
 
 {!- if lookup !}
 
-  lookup:
-    {= lookup | yaml(False) | indent(4) =}
+  {= {"lookup": lookup} | yaml_with_descriptions(settings_descriptions, extra_comment_indent=2) | indent(2) =}
 {!- endif !}
 
   tofs:

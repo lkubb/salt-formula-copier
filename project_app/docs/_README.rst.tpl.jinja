@@ -1,16 +1,34 @@
-.. _readme:
+.. include-header-start
 
 {= service_name =} Formula
 {= '=' * service_name | length =}========
 
-Manages {= service_name =} in the user environment.
+{= description =}.
+
+.. include-header-end
 
 .. contents:: **Table of Contents**
    :depth: 1
 
-Usage
------
-Applying ``{= state_root =}`` will make sure ``{= service_abbr =}`` is configured as specified.
+Installation
+------------
+
+See the full `SaltStack Formulas installation and usage instructions
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html>`_.
+
+General notes
+-------------
+This formula is based around the :ref:`mapstack <map.jinja>` and :ref:`TOFS <tofs_pattern>` patterns, which make formula configuration very modular. It is highly advised to understand their application when using this formula.
+
+It is part of the `tool suite <docs/topics/toolsuite.rst>`_, which follows a common configuration structure.
+
+.. include-notes-start
+
+Special notes
+-------------
+None.
+
+.. include-notes-end
 
 {!- if "execution" in extmods and "state" in extmods !}
 
@@ -139,6 +157,9 @@ Development
 
 Contributing to this repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are interested in writing or contributing to formulas, please pay attention to the `Writing Formula Section
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#writing-formulas>`_.
 
 Commit messages
 ^^^^^^^^^^^^^^^

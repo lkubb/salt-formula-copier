@@ -1,0 +1,70 @@
+---
+os_support:
+  type: str
+  multiselect: true
+  help: Supported operating systems.
+  default:
+    - Linux
+    - MacOS
+    - Windows
+  choices:
+    - Linux
+    - MacOS
+    - Windows
+    - FreeBSD
+    - OpenBSD
+    - SmartOS
+    - Solaris
+  validator: >-
+    {!- if not os_support -!}
+      At least one supported OS is required.
+    {!- endif -!}
+
+linux_family_support:
+  type: str
+  multiselect: true
+  help: Supported Linux distribution families.
+  when: '{= "Linux" in os_support =}'
+  default:
+    - Debian
+    - RedHat
+  choices:
+    - Alpine
+    - Arch
+    - Debian
+    - Gentoo
+    - RedHat
+    - Suse
+
+oss:
+  type: json
+  when: false
+  default: >-
+    {!- set oss = [] -!}
+    {!- for os in ["MacOS", "Windows", "FreeBSD", "OpenBSD", "SmartOS", "Solaris"] -!}
+    {!-   if os in os_support -!}
+    {!-     do oss.append(os) -!}
+    {!-   endif -!}
+    {!- endfor -!}
+    {!- if "Linux" in os_support -!}
+    {!-   set linux_family_oss = {"Alpine": ["Alpine"], "Arch": ["Arch", "Manjaro"], "Debian": ["Debian", "Ubuntu", "Raspbian"], "Gentoo": ["Funtoo", "Gentoo"], "RedHat": ["RedHat", "Fedora", "CentOS", "Oracle", "Amazon"], "Suse": ["SUSE", "openSUSE"]} -!}
+    {!-   for family in linux_family_support -!}
+    {!-     do oss.extend(linux_family_oss[family]) -!}
+    {!-   endfor -!}
+    {!- endif -!}
+    {=- oss | to_json -=}
+
+os_families:
+  type: json
+  when: false
+  default: >-
+    {!- set os_families = [] -!}
+    {!- for os in ["MacOS", "Windows", "FreeBSD", "OpenBSD", "SmartOS", "Solaris"] -!}
+    {!-   if os in os_support -!}
+    {!-     do os_families.append(os) -!}
+    {!-   endif -!}
+    {!- endfor -!}
+    {!- if "Linux" in os_support -!}
+    {!-   do os_families.extend(linux_family_support) -!}
+    {!- endif -!}
+    {=- os_families | to_json -=}

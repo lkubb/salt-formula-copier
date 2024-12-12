@@ -1,0 +1,1 @@
+../../common/docs/sitevars.rst

@@ -57,13 +57,13 @@ sub_heading_char = "^"
   # Make state IDs literal – ``state.id`` instead of state.id
 literal_sub_heading = false
   # File to write to
-target = "docs/states.rst"
+target = "docs/ref/states.rst"
 
 [tool.slsdoc.depth_renderer]
   # maxdepth for generated index.rst files (toctree)
 index_maxdepth = 4
   # Directory to write to
-target = "docs/states"
+target = "docs/ref/states"
 
 [tool.slsdoc.depth_renderer.single_opts]
   # Include init.sls files in state list
@@ -350,6 +350,7 @@ The following states are found in {where}:
         "main_heading_char": "=",
         "sub_heading_char": "-",
         "literal_sub_heading": False,
+        "state_rst_directive": "",
     }
 
     def __init__(self, target="docs", prefix=None, basedir=base_dir, opts=None):
@@ -491,7 +492,7 @@ class SingleRenderer(Renderer):
     }
 
     def __init__(
-        self, target="docs/states.rst", prefix=None, basedir=base_dir, **kwargs
+        self, target="docs/ref/states.rst", prefix=None, basedir=base_dir, **kwargs
     ):
         if isinstance(target, str):
             target = Path(target)
@@ -523,14 +524,25 @@ class SingleRenderer(Renderer):
                 )
                 if state_id == ".":
                     continue
-                self._write_heading(
-                    state.to_state_id(
-                        self.opts["init_suffix"],
-                        relative_to,
-                        formula_root=self.opts["include_formula_root"],
-                    )
-                )
-                self._write(state.comment, 3)
+                self._write_state(state, relative_to)
+
+    def _write_state(self, state, relative_to):
+        if self.opts["state_rst_directive"]:
+            full_id = state.to_state_id(
+                self.opts["init_suffix"],
+                "",
+                formula_root=self.opts["include_formula_root"],
+            )
+            self._write(f".. {self.opts['state_rst_directive']}:: {full_id}\n")
+
+        self._write_heading(
+            state.to_state_id(
+                self.opts["init_suffix"],
+                relative_to,
+                formula_root=self.opts["include_formula_root"],
+            )
+        )
+        self._write(state.comment, 3)
 
 
 class DepthRenderer(Renderer):
@@ -550,15 +562,15 @@ class DepthRenderer(Renderer):
                 └── read_receipts
 
     will result in these files:
-        * docs/settings/index.rst
+        * docs/ref/settings/index.rst
             - animations
             - apps/index
-        * docs/settings/animations.rst
+        * docs/ref/settings/animations.rst
             - cursor_blinking doc
             - window_resize_time doc
-        * docs/settings/apps/index.rst
+        * docs/ref/settings/apps/index.rst
             - messages
-        * docs/settings/apps/messages.rst
+        * docs/ref/settings/apps/messages.rst
             - read_receipts doc
     """
 
@@ -577,7 +589,7 @@ class DepthRenderer(Renderer):
     def __init__(
         self,
         max_depth=1,
-        target="docs/states",
+        target="docs/ref/states",
         delegate_cls=None,
         basedir=base_dir,
         **kwargs,

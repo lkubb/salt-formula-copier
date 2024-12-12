@@ -1,0 +1,78 @@
+.. include-header-start
+
+{= service_name =} Formula
+{= '=' * service_name | length =}========
+
+|img_sr| |img_pc|
+
+.. |img_sr| image:: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
+   :alt: Semantic Release
+   :target: https://github.com/semantic-release/semantic-release
+.. |img_pc| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :alt: pre-commit
+   :target: https://github.com/pre-commit/pre-commit
+
+{= description =}.
+
+.. include-header-end
+
+.. contents:: **Table of Contents**
+   :depth: 1
+
+Installation
+------------
+
+See the full `SaltStack Formulas installation and usage instructions
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html>`_.
+
+General notes
+-------------
+This formula is based around the :ref:`mapstack <map.jinja>` and :ref:`TOFS <tofs_pattern>` patterns, which make formula configuration very modular. It is highly advised to understand their application when using this formula.
+
+.. include-notes-start
+
+Special notes
+-------------
+* This formula is written with the custom `compose modules <https://github.com/lkubb/salt-podman-formula>`_ in mind and will not work without them.
+
+.. include-notes-end
+
+Configuration
+-------------
+An example pillar is provided, please see `pillar.example`. Note that you do not need to specify everything by pillar. Often, it's much easier and less resource-heavy to use the ``parameters/<grain>/<value>.yaml`` files for non-sensitive settings. The underlying logic is explained in `map.jinja`.
+
+Available states
+----------------
+Need to be rendered still.
+
+Contributing to this repo
+-------------------------
+
+If you are interested in writing or contributing to formulas, please pay attention to the `Writing Formula Section
+<https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#writing-formulas>`_.
+
+Commit messages
+^^^^^^^^^^^^^^^
+
+**Commit message formatting is significant!**
+
+Please see `How to contribute <https://github.com/saltstack-formulas/.github/blob/master/CONTRIBUTING.rst>`_ for more details.
+
+pre-commit
+^^^^^^^^^^
+
+`pre-commit <https://pre-commit.com/>`_ is configured for this formula, which you may optionally use to ease the steps involved in submitting your changes.
+First install  the ``pre-commit`` package manager using the appropriate `method <https://pre-commit.com/#installation>`_, then run ``bin/install-hooks`` and
+now ``pre-commit`` will run automatically on each ``git commit``. ::
+
+  $ bin/install-hooks
+  pre-commit installed at .git/hooks/pre-commit
+  pre-commit installed at .git/hooks/commit-msg
+
+State documentation
+~~~~~~~~~~~~~~~~~~~
+There is a script that semi-autodocuments available states: ``bin/slsdoc``.
+
+If a ``.sls`` file begins with a Jinja comment, it will dump that into the docs. It can be configured differently depending on the formula. See the script source code for details currently.
+
+This means if you feel a state should be documented, make sure to write a comment explaining it.

@@ -41,7 +41,7 @@ repos:
       - id: salt-lint
         name: Check Salt files using salt-lint
         files: ^.*\.(sls|jinja|j2|tmpl|tst)$
-{!- if flavor == "app" and extmods !}
+{!- if extmods !}
   - repo: https://github.com/timothycrosley/isort
     rev: 5.12.0
     hooks:
@@ -73,7 +73,17 @@ repos:
             _modules/.*|
             _states/.*
           )
+
+  - repo: local
+    hooks:
+      - id: check-docs
+        name: Check rST doc files exist for extmods
+        entry: python bin/make-autodocs.py
+        language: python
+        pass_filenames: false
+
 {!- endif !}
+
   - repo: local
     hooks:
       - id: slsdoc

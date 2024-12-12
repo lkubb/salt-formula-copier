@@ -1,40 +1,103 @@
-[tool.poetry]
+[build-system]
+requires = [
+    "wheel",
+    "setuptools>=50.3.2",
+    "setuptools_scm[toml]>=3.4",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "{= state_root =}_formula"
-version = "1.0.0"
 description = "Saltstack {! if flavor == "app" and extmods !}{= extmods | sort | join("/") =} modules and {! endif !}states to manage {= service_name =}"
-authors = ["{= author =}"]
-
-[tool.poetry.dependencies]
-python = "^3.6.2"
-
-[tool.poetry.dev-dependencies]
-{!- if flavor == "app" and extmods !}
-salt = "^3005"
-black = "^23.1.0"
-isort = "^5.12.0"
+authors = [
+    {name = "{= author =}"},
+]
+keywords = [
+    "salt-formula",
+    "saltstack-formula",
+]
+license = {text = "{= license_name =}"}
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+{!- if license_classifier !}
+    "{= license_classifier =}",
 {!- endif !}
-Sphinx = "^4"
-# this is the official saltstack theme
-# sphinx-material-saltstack = "^1.0.5"
-sphinx-rtd-theme = "^1.0.0"
-# fulltoc has an issue with recent Sphinx versions ('easily' fixable in the source code though)
-# sphinxcontrib-fulltoc = "^1.2.0"
+]
+requires-python = ">= 3.9"
+dynamic = ["version"]
+dependencies = []
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "{= url =}"
+{!- if docs_url !}
+Documentation = "{= docs_url =}"
+{!- endif !}
+{!- if source_url !}
+Source = "{= source_url =}"
+{!- endif !}
+{!- if tracker_url !}
+Tracker = "{= tracker_url =}"
+{!- endif !}
+
+[project.optional-dependencies]
+dev = [
+    "salt>={= salt_version =}",
+    "nox[uv]>=2024.3",
+    "pre-commit>=2.21.0",
+]
+docs = [
+  "sphinx",
+  "sphinx-prompt",
+  "sphinxcontrib-spelling",
+  "sphinx-copybutton",
+  "myst_parser",
+  "furo",
+  "sphinx-inline-tabs",
+]
+docsauto = ["sphinx-autobuild"]
+lint = [
+    "pylint==3.2.6",
+]
+tests = [
+    "pytest>=7.2.0",
+    "pytest-salt-factories>=1.0.0; sys_platform == 'win32'",
+    "pytest-salt-factories[docker]>=1.0.0; sys_platform != 'win32'",
+]
+
+[tool.build_sphinx]
+source_dir = "docs"
+build_dir = "build/sphinx"
+
+[tool.isort]
+profile = "black"
 
 [tool.slsdoc]
 include_empty = true
 
 [tool.slsdoc.single_renderer]
-header = "Available states"
+header = "States"
 description = """\
 The following states are found in this formula:
 
 .. contents::
    :local:
+   :class: this-will-duplicate-information-and-it-is-still-useful-here no-toc
 """
 main_heading_char = "-"
 sub_heading_char = "{= "~" if flavor == "app" else "^" =}"
 literal_sub_heading = true
+state_rst_directive = "state"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+where = []
+exclude = ["*"]
+namespaces = false
