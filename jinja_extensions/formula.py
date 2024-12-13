@@ -240,6 +240,8 @@ def yaml_with_descriptions(
     extra_comment_indent=0,
     comment_width=70,
     prefix=None,
+    commented_out=False,
+    comment_prefix=0,
 ):
     """
     Renders ``pillar.example`` files.
@@ -255,6 +257,22 @@ def yaml_with_descriptions(
 
         desc
             Basic description. Can be a multiline string.
+
+        example
+            Empty mappings/sequences can render commented out
+            example values below the corresponding key.
+
+        extra_config
+            Especially when serializing configuration, you might not want
+            to set defaults, but provide some guidance on possible values.
+            This is rendered as a comment below the corresponding key.
+            The configuration here can have descriptions as well.
+
+        extra_config_header
+            Override the default header for ``extra_config``.
+
+        extra_config_footer
+            Override the default footer for ``extra_config``.
 
         width
             Override the default ``comment_width`` for this setting only.
@@ -278,12 +296,25 @@ def yaml_with_descriptions(
 
     prefix
         A list/tuple of prefixes. For internal use (rendering nested configuration needs recursion).
+
+    commented_out
+        Render keys and values as comments. Defaults to false.
+
+    comment_prefix
+        Length of the prefix the comments should be ligned up to.
     """
     prefix = prefix or []
     lines = []
 
     def add_lines(*new_lines, cur_prefix):
-        lines.extend(" " * indent * len(cur_prefix) + line for line in new_lines)
+        line_prefix = " " * indent * len(cur_prefix)
+        if commented_out:
+            line_prefix = (
+                line_prefix[: comment_prefix * indent]
+                + "# "
+                + line_prefix[comment_prefix * indent :]
+            )
+        lines.extend(line_prefix + line for line in new_lines)
 
     for key, val in settings.items():
         path = delimiter.join(prefix + [key])
@@ -330,8 +361,40 @@ def yaml_with_descriptions(
                     prefix=prefix + [key],
                     indent=indent,
                     extra_comment_indent=extra_comment_indent,
+                    commented_out=commented_out,
+                    comment_prefix=comment_prefix,
                 )
             )
+
+        if meta.get("extra_config") and isinstance(val, Mapping):
+            if (extra_header := meta.get("extra_config_header")) is not None:
+                if not isinstance(extra_header, list):
+                    extra_header = extra_header.splitlines()
+                add_lines(*extra_header, cur_prefix=prefix)
+            elif val:
+                add_lines("", f"### More configuration", cur_prefix=prefix)
+            else:
+                add_lines(f"### Possible configuration", cur_prefix=prefix)
+            lines.extend(
+                yaml_with_descriptions(
+                    meta["extra_config"],
+                    descriptions,
+                    delimiter=delimiter,
+                    prefix=prefix + [key],
+                    indent=indent,
+                    extra_comment_indent=extra_comment_indent,
+                    commented_out=True,
+                    comment_prefix=len(prefix),
+                )
+            )
+            if (extra_footer := meta.get("extra_config_footer")) is not None:
+                if not isinstance(extra_footer, list):
+                    extra_footer = extra_footer.splitlines()
+                add_lines(*extra_footer, cur_prefix=prefix)
+            elif val:
+                add_lines("###", "", cur_prefix=prefix)
+            else:
+                add_lines("###", cur_prefix=prefix)
 
     if prefix:
         return lines
