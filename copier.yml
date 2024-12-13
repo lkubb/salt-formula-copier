@@ -147,6 +147,9 @@ settings:
     {!- if settings is not mapping !}Must be a mapping{!- endif !}
   default: '{}'
 
+# See jinja_extensions/formula.py::yaml_with_descriptions/myst_with_descriptions
+# for possible configuration values.
+
 # Example data:
 # foo:
 #   desc: Settings for the `foo` submodule
@@ -157,9 +160,14 @@ settings:
 settings_descriptions:
   type: yaml
   multiline: true
-  default: '{}'
+  default: |
+    {!- for flattened in settings | flatten_dict(include_intermediates=True) !}
+    {= flattened =}:
+      desc: ''
+    {!- endfor !}
+
   help: >
-    Description of `settings` values. Keys are flattened paths, values mappings (with keys: `desc`)
+    Description of `settings` values, keys are flattened, values config for doc dump.
 
 ---
 # Customizable project metadata and docs questions

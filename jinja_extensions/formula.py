@@ -323,7 +323,7 @@ def yaml_with_descriptions(
             meta = descriptions[path]
             if not isinstance(meta, Mapping):
                 raise TypeError(f"Wrong meta description at '{path}'")
-            if "desc" in meta:
+            if meta.get("desc"):
                 item_lines = meta["desc"].strip().splitlines()
                 if len(item_lines) == 1:
                     item_lines = textwrap.wrap(
@@ -340,7 +340,7 @@ def yaml_with_descriptions(
         if not isinstance(val, Mapping) or not val:
             add_lines(*dump_yaml({key: val}).splitlines(), cur_prefix=prefix)
             if (
-                "example" in meta
+                meta.get("example")
                 and not val
                 and isinstance(val, (Mapping, Sequence))
                 and not isinstance(val, str)
