@@ -38,17 +38,16 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
+*.py,cover
 .hypothesis/
-.kitchen
-.kitchen.local.yml
-kitchen.local.yml
-junit-*.xml
+.pytest_cache/
 
 # Translations
 *.mo
@@ -110,25 +109,8 @@ ENV/
 # Bundler
 .bundle/
 
-# copied `.md` files used for conversion to `.rst` using `m2r`
-docs/*.md
-
 # Vim
 *.sw?
 
-## Collected when centralising formulas (check and sort)
-# `collectd-formula`
-.pytest_cache/
-/.idea/
-Dockerfile.*_*
-ignore/
-tmp/
-
-# `salt-formula` -- Vagrant Specific files
-.vagrant
-top.sls
-!test/salt/pillar/top.sls
-
-# `suricata-formula` -- Platform binaries
-*.rpm
-*.deb
+# CI
+artifacts/
